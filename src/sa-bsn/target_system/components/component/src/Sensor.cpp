@@ -1,6 +1,6 @@
 #include "component/Sensor.hpp"
 
-Sensor::Sensor(int &argc, char **argv, const std::string &name, const std::string &type, const bool &active, const double &noise_factor, const bsn::resource::Battery &battery, const bool &instant_recharge, double &voltage, double &min_voltage, double &max_voltage) : Component(argc, argv, name), type(type), active(active), buffer_size(1), replicate_collect(1), noise_factor(0), battery(battery), data(0.0), instant_recharge(instant_recharge), cost(0.0), voltage(voltage), min_voltage(min_voltage), max_voltage(max_voltage) {}
+Sensor::Sensor(int &argc, char **argv, const std::string &name, const std::string &type, const bool &active, const double &noise_factor, const bsn::resource::Battery &battery, const bool &instant_recharge, const double &voltage, const double &min_voltage, const double &max_voltage) : Component(argc, argv, name), type(type), active(active), buffer_size(1), replicate_collect(1), noise_factor(0), battery(battery), data(0.0), instant_recharge(instant_recharge), cost(0.0), voltage(voltage), min_voltage(min_voltage), max_voltage(max_voltage) {}
 
 Sensor::~Sensor() {}
 
