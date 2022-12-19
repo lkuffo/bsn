@@ -5,6 +5,12 @@ float64 oxi_batt
 float64 abps_batt
 float64 abpd_batt
 float64 glc_batt
+float64 trm_volt
+float64 ecg_volt
+float64 oxi_volt
+float64 abps_volt
+float64 abpd_volt
+float64 glc_volt
 float64 trm_risk
 float64 ecg_risk
 float64 oxi_risk

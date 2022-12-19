@@ -82,6 +82,7 @@ void G4T1::collect(const messages::SensorData::ConstPtr& msg) {
     int type = getSensorId(msg->type);
     double risk = msg->risk;
     double batt = msg->batt;
+    double volt = msg->volt;
     
     battery.consume(BATT_UNIT);
     if (msg->type == "null" || int32_t(risk) == -1)  throw std::domain_error("risk data out of boundaries");
@@ -89,21 +90,27 @@ void G4T1::collect(const messages::SensorData::ConstPtr& msg) {
     /*update battery status for received sensor info*/
     if (msg->type == "thermometer") {
         trm_batt = batt;
+        trm_volt = volt;
         trm_raw = msg->data;
     } else if (msg->type == "ecg") {
         ecg_batt = batt;
+        ecg_volt = volt;
         ecg_raw = msg->data;
     } else if (msg->type == "oximeter") {
         oxi_batt = batt;
+        oxi_volt = volt;
         oxi_raw = msg->data;
     } else if (msg->type == "abps") {
         abps_batt = batt;
+        abps_volt = volt;
         abps_raw = msg->data;
     } else if (msg->type == "abpd") {
         abpd_batt = batt;
+        abpd_volt = volt;
         abpd_raw = msg->data;
     } else if (msg->type == "glucosemeter") {
         glc_batt = batt;
+        glc_volt = volt;
         glc_raw = msg->data;
     }
 
@@ -191,6 +198,13 @@ void G4T1::transfer() {
     msg.abps_batt = abps_batt;
     msg.abpd_batt = abpd_batt;
     msg.glc_batt = glc_batt;
+
+    msg.trm_volt = trm_volt;
+    msg.ecg_volt = ecg_volt;
+    msg.oxi_volt = oxi_volt;
+    msg.abps_volt = abps_volt;
+    msg.abpd_volt = abpd_volt;
+    msg.glc_volt = glc_volt;
 
     msg.trm_risk = trm_risk;
     msg.ecg_risk = ecg_risk;

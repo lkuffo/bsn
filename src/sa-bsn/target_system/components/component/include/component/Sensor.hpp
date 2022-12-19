@@ -15,7 +15,7 @@
 class Sensor : public arch::target_system::Component {
 
     public:
-		Sensor(int &argc, char **argv, const std::string &name, const std::string &type, const bool &active, const double &noise_factor, const bsn::resource::Battery &battery, const bool &instant_recharge);
+		Sensor(int &argc, char **argv, const std::string &name, const std::string &type, const bool &active, const double &noise_factor, const bsn::resource::Battery &battery, const bool &instant_recharge, double &voltage, double &min_voltage, double &max_voltage);
     	~Sensor();
 
 	private:
@@ -37,9 +37,11 @@ class Sensor : public arch::target_system::Component {
 
     protected:
         bool isActive();
+        bool isVoltageOk();
         void turnOn();
         void turnOff();
         void recharge();
+        void fixVoltage();
 
     protected:
 		std::string type;
@@ -52,6 +54,9 @@ class Sensor : public arch::target_system::Component {
         bool instant_recharge;
         bool shouldStart;
         double cost;
+        double voltage;
+        double min_voltage;
+        double max_voltage;
 };
 
 #endif 

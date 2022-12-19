@@ -10,6 +10,7 @@ namespace arch {
             log_event = handle.advertise<archlib::Event>("log_event", 1000);
             log_status = handle.advertise<archlib::Status>("log_status", 1000);
             log_energy_status = handle.advertise<archlib::EnergyStatus>("log_energy_status", 1000);
+            log_voltage_status = handle.advertise<archlib::VoltageStatus>("log_voltage_status", 1000);
 
             double freq;
 	        handle.getParam("frequency", freq);
@@ -33,11 +34,16 @@ namespace arch {
             log_energy_status.publish(msg);
         }
 
+        void Probe::collectVoltageStatus(const archlib::VoltageStatus::ConstPtr& msg) {
+            log_voltage_status.publish(msg);
+        }
+
         void Probe::body(){
             ros::NodeHandle n;
             ros::Subscriber collect_event = n.subscribe("collect_event", 1000, &Probe::collectEvent, this);
             ros::Subscriber collect_status = n.subscribe("collect_status", 1000, &Probe::collectStatus, this);
             ros::Subscriber collect_energy_status = n.subscribe("collect_energy_status", 100, &Probe::collectEnergyStatus, this);
+            ros::Subscriber collect_voltage_status = n.subscribe("collect_voltage_status", 100, &Probe::collectVoltageStatus, this);
             ros::spin();
         }
 	}

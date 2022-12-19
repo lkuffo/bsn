@@ -29,6 +29,16 @@ void Injector::setUp() {
         config.getParam((*component) + "/begin", beg);
         begin[*component] = seconds_in_cycles(beg);
         end[*component] = begin[*component] + seconds_in_cycles(duration[*component]);
+
+        config.getParam((*component) + "/volt_duration", volt_duration[*component]);
+        config.getParam((*component) + "/volt_frequency", volt_frequency[*component]);
+        config.getParam((*component) + "/volt_frequency", volt_factor[*component]); // dummy
+        config.getParam((*component) + "/volt_min", volt_min[*component]);
+        config.getParam((*component) + "/volt_max", volt_max[*component]);
+        int volt_beg;
+        config.getParam((*component) + "/volt_begin", volt_beg);
+        volt_begin[*component] = seconds_in_cycles(volt_beg);
+        volt_end[*component] = volt_begin[*component] + seconds_in_cycles(volt_duration[*component]);
     }
 }
 
@@ -57,6 +67,18 @@ double Injector::gen_noise(const std::string &component, double &noise, int &dur
     return 0.0;
 }
 
+double Injector::gen_volt_noise(const std::string &component, double &volt_min_amp, double &volt_max_amp){
+
+    bool is_last_cycle = (cycles == volt_end[component])?true:false;
+
+    if (is_last_cycle){
+        return 1; // no change in same cycle
+    }
+
+    return ((double)rand()) / ((double)RAND_MAX) * (volt_max_amp - volt_min_amp) + volt_min_amp;
+    
+}
+
 void Injector::body() {
     ++cycles;
 
@@ -72,6 +94,19 @@ void Injector::body() {
                 end[*component]   += seconds_in_cycles(1.0/frequency[*component]);
             }
         }
+
+        if (volt_begin[*component] <= cycles && cycles <= volt_end[*component]) {
+
+            volt_factor[*component] = gen_volt_noise(*component, volt_min[*component], volt_max[*component]);
+            inject(*component, "voltage_factor=" + std::to_string(volt_factor[*component]));
+
+            //update begin and end tags in last cycle
+            if (cycles == volt_end[*component]){
+                volt_begin[*component] += seconds_in_cycles(1.0/volt_frequency[*component]);
+                volt_end[*component]   += seconds_in_cycles(1.0/volt_frequency[*component]);
+            }
+        }
+
     }
 }
 

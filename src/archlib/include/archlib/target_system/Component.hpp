@@ -9,6 +9,7 @@
 #include "archlib/Event.h"
 #include "archlib/Status.h"
 #include "archlib/EnergyStatus.h"
+#include "archlib/VoltageStatus.h"
 #include "archlib/AdaptationCommand.h"
 #include "archlib/EffectorRegister.h"
 
@@ -36,6 +37,7 @@ namespace arch {
                 void sendEvent(const std::string &content);
 		        void sendStatus(const std::string &content);
                 void sendEnergyStatus(const double &cost);
+                void sendVoltageStatus(const double &voltage);
 
                 virtual void reconfigure(const archlib::AdaptationCommand::ConstPtr& msg);
 
@@ -52,6 +54,7 @@ namespace arch {
                 ros::Publisher collect_event;
                 ros::Publisher collect_status;
                 ros::Publisher collect_energy_status;
+                ros::Publisher collect_voltage_status;
                 ros::Subscriber effect;
         };
 

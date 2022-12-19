@@ -59,6 +59,13 @@ class G4T1 : public CentralHub {
         double trm_batt;
         double glc_batt;
 
+        double abps_volt;
+        double abpd_volt;
+        double oxi_volt;
+        double ecg_volt;
+        double trm_volt;
+        double glc_volt;
+
         double abps_raw;
         double abpd_raw;
         double oxi_raw;

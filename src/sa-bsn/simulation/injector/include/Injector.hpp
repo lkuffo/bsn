@@ -26,6 +26,7 @@ class Injector : public arch::ROSComponent {
 		int64_t seconds_in_cycles(const double &seconds);
 		int64_t cycles_in_seconds(const double &cycles);
 		double gen_noise(const std::string &component, double &noise, int &duration, double &amplitude, std::string &type);
+		double gen_volt_noise(const std::string &component, double &volt_min_amp,  double &volt_max_amp);
 
 	public:
 		virtual void setUp();
@@ -50,6 +51,14 @@ class Injector : public arch::ROSComponent {
 		std::map<std::string, int> end;
 		std::map<std::string, std::string> type;
 
+
+		std::map<std::string, double> volt_factor;
+		std::map<std::string, int> volt_duration;
+		std::map<std::string, double> volt_frequency;
+		std::map<std::string, double> volt_min;
+		std::map<std::string, double> volt_max;
+		std::map<std::string, int> volt_begin;
+		std::map<std::string, int> volt_end;
 
 
 		ros::Publisher log_uncertainty;

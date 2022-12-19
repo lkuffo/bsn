@@ -1,6 +1,6 @@
 #include "component/Sensor.hpp"
 
-Sensor::Sensor(int &argc, char **argv, const std::string &name, const std::string &type, const bool &active, const double &noise_factor, const bsn::resource::Battery &battery, const bool &instant_recharge) : Component(argc, argv, name), type(type), active(active), buffer_size(1), replicate_collect(1), noise_factor(0), battery(battery), data(0.0), instant_recharge(instant_recharge), cost(0.0) {}
+Sensor::Sensor(int &argc, char **argv, const std::string &name, const std::string &type, const bool &active, const double &noise_factor, const bsn::resource::Battery &battery, const bool &instant_recharge, double &voltage, double &min_voltage, double &max_voltage) : Component(argc, argv, name), type(type), active(active), buffer_size(1), replicate_collect(1), noise_factor(0), battery(battery), data(0.0), instant_recharge(instant_recharge), cost(0.0), voltage(voltage), min_voltage(min_voltage), max_voltage(max_voltage) {}
 
 Sensor::~Sensor() {}
 
@@ -11,6 +11,9 @@ Sensor& Sensor::operator=(const Sensor &obj) {
     this->battery = obj.battery;
     this->data = obj.data;
     this->instant_recharge = obj.instant_recharge;
+    this->voltage = obj.voltage;
+    this->min_voltage = obj.min_voltage;
+    this->max_voltage = obj.max_voltage;
 }
 
 int32_t Sensor::run() {
@@ -47,9 +50,9 @@ int32_t Sensor::run() {
 
 void Sensor::body() {
     
-    if (!isActive() && battery.getCurrentLevel() > 90){
+    if (!isActive() && battery.getCurrentLevel() > 90 && isVoltageOk()){
         turnOn();
-    } else if (isActive() && battery.getCurrentLevel() < 2){
+    } else if (isActive() && (battery.getCurrentLevel() < 2 || !isVoltageOk())){
         turnOff();        
     }
 
@@ -73,10 +76,18 @@ void Sensor::body() {
         transfer(data);
 		sendStatus("success");
         sendEnergyStatus(cost);
+        sendVoltageStatus(voltage);
+        // TODO: IMPLEMENT SEND VOLTAGE STATUS....
         cost = 0.0;
     } else {
-        recharge();
-        throw std::domain_error("out of charge");
+        if (battery.getCurrentLevel() < 2){
+            recharge();
+            throw std::domain_error("out of charge");
+        }
+        if (!isVoltageOk()){
+            fixVoltage(); // In our case, Sensor is capable of reconfiguring itself
+            throw std::domain_error("fixing voltage");
+        }
     }
 }
 
@@ -106,6 +117,12 @@ void Sensor::reconfigure(const archlib::AdaptationCommand::ConstPtr& msg) {
         } else if (param[0]=="replicate_collect") {
             int new_replicate_collect = stoi(param[1]);
             if(new_replicate_collect>1 && new_replicate_collect<200) replicate_collect = new_replicate_collect;
+        } else if (param[0]=="volt"){
+            double new_volt =  stod(param[1]);
+            if (new_volt > max_voltage || new_volt < min_voltage){
+                new_volt = 0; // to avoid component damage
+            }
+            voltage = new_volt;
         }
     }
 }
@@ -120,6 +137,10 @@ void Sensor::injectUncertainty(const archlib::Uncertainty::ConstPtr& msg) {
 
         if(param[0]=="noise_factor"){
             noise_factor = stod(param[1]);
+        }
+        if(param[0]=="voltage_factor"){
+            double voltage_factor = stod(param[1]);
+            voltage = voltage * voltage_factor;
         }
     }
 }
@@ -154,4 +175,18 @@ void Sensor::recharge() {
     } else {
         battery.generate(100);
     }
+}
+
+bool Sensor::isVoltageOk(){
+    if(voltage < min_voltage){
+        return false;
+    }
+    if (voltage > max_voltage){
+        return false;
+    }
+    return true;
+}
+
+void Sensor::fixVoltage(){
+    voltage = min_voltage;
 }

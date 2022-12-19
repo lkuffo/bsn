@@ -9,7 +9,7 @@ using namespace bsn::configuration;
 
 
 G3T1_4::G3T1_4(int &argc, char **argv, const std::string &name) :
-    Sensor(argc, argv, name, "abps", true, 1, bsn::resource::Battery("abps_batt", 100, 100, 1), false),
+    Sensor(argc, argv, name, "abps", true, 1, bsn::resource::Battery("abps_batt", 100, 100, 1), false, 0, 0, 0),
     markov(),
     dataGenerator(),
     filter(1),
@@ -77,6 +77,10 @@ void G3T1_4::setUp() {
 
     { //Check for instant recharge parameter
         handle.getParam("instant_recharge", instant_recharge);
+
+        handle.getParam("voltage", voltage);
+        handle.getParam("min_voltage", min_voltage);
+        handle.getParam("max_voltage", max_voltage);
     }
 }
 
@@ -98,8 +102,8 @@ double G3T1_4::collect() {
         ROS_INFO("error collecting data");
     }
 
-    battery.consume(BATT_UNIT);
-    cost += BATT_UNIT;
+    battery.consume(BATT_UNIT*(10/voltage));
+    cost += BATT_UNIT*(10/voltage);
 
     collected_risk = sensorConfig.evaluateNumber(m_data);
 
@@ -112,8 +116,8 @@ double G3T1_4::process(const double &m_data) {
     
     filter.insert(m_data);
     filtered_data = filter.getValue();
-    battery.consume(BATT_UNIT*filter.getRange());
-    cost += BATT_UNIT*filter.getRange();
+    battery.consume(BATT_UNIT*filter.getRange()*(10/voltage));
+    cost += BATT_UNIT*filter.getRange()*(10/voltage);
 
     ROS_INFO("filtered data: [%s]", std::to_string(filtered_data).c_str());
     return filtered_data;
@@ -132,11 +136,12 @@ void G3T1_4::transfer(const double &m_data) {
     msg.data = m_data;
     msg.risk = risk;
     msg.batt = battery.getCurrentLevel();
+    msg.volt = voltage;
 
     data_pub.publish(msg);
     
-    battery.consume(BATT_UNIT);
-    cost += BATT_UNIT;
+    battery.consume(BATT_UNIT*(10/voltage));
+    cost += BATT_UNIT*(10/voltage);
 
     ROS_INFO("risk calculated and transferred: [%.2f%%]", risk);
 }

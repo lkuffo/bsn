@@ -24,6 +24,7 @@
 
 #include "StatusMessage.hpp"
 #include "EnergyStatusMessage.hpp"
+#include "VoltageStatusMessage.hpp"
 #include "EventMessage.hpp"
 #include "UncertaintyMessage.hpp"
 #include "AdaptationMessage.hpp"
@@ -47,6 +48,7 @@ class DataAccess : public arch::ROSComponent {
 		void persistEvent(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content);
 		void persistStatus(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content);
 		void persistEnergyStatus(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content);
+		void persistVoltageStatus(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content);
 		void persistUncertainty(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content);
 		void persistAdaptation(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content);
 
@@ -82,6 +84,7 @@ class DataAccess : public arch::ROSComponent {
 		std::string event_filepath;
 		std::string status_filepath;
 		std::string energy_status_filepath;
+		std::string voltage_status_filepath;
 		std::string uncertainty_filepath;
 		std::string adaptation_filepath;
 
@@ -89,6 +92,7 @@ class DataAccess : public arch::ROSComponent {
 
 		std::vector<StatusMessage> statusVec;
 		std::vector<EnergyStatusMessage> energystatusVec;
+		std::vector<VoltageStatusMessage> voltagestatusVec;
 		std::vector<EventMessage> eventVec;
 		std::vector<UncertaintyMessage> uncertainVec;
 		std::vector<AdaptationMessage> adaptVec;
@@ -99,6 +103,7 @@ class DataAccess : public arch::ROSComponent {
 
 		std::map<std::string, double> components_reliabilities;
 		std::map<std::string, double> components_batteries;
+		std::map<std::string, double> components_voltages;
 		std::map<std::string, double> components_costs_engine, components_costs_enactor;
 		std::map<std::string, uint32_t> contexts;
 

@@ -40,6 +40,7 @@ void DataAccess::setUp() {
     event_filepath = path + "/../resource/logs/event_" + now + ".log";
     status_filepath = path + "/../resource/logs/status_" + now + ".log";
     energy_status_filepath = path + "/../resource/logs/energystatus_" + now + ".log";
+    voltage_status_filepath = path + "/../resource/logs/voltagestatus_" + now + ".log";
     uncertainty_filepath = path + "/../resource/logs/uncertainty_" + now + ".log";
     adaptation_filepath = path + "/../resource/logs/adaptation_" + now + ".log";
 
@@ -52,6 +53,10 @@ void DataAccess::setUp() {
     fp.close();
 
     fp.open(energy_status_filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
+    fp << "\n";
+    fp.close();
+
+    fp.open(voltage_status_filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
     fp << "\n";
     fp.close();
 
@@ -80,6 +85,12 @@ void DataAccess::setUp() {
     components_batteries["g3t1_4"] = 100;
     components_batteries["g3t1_5"] = 100;
     components_batteries["g3t1_6"] = 100;
+    components_voltages["g3t1_1"] = 0;
+    components_voltages["g3t1_2"] = 0;
+    components_voltages["g3t1_3"] = 0;
+    components_voltages["g3t1_4"] = 0;
+    components_voltages["g3t1_5"] = 0;
+    components_voltages["g3t1_6"] = 0;
     components_costs_enactor["g3t1_1"] = 0;
     components_costs_enactor["g3t1_2"] = 0;
     components_costs_enactor["g3t1_3"] = 0;
@@ -113,6 +124,12 @@ void DataAccess::processTargetSystemData(const messages::TargetSystemData::Const
     components_batteries["g3t1_4"] = msg->abps_batt;
     components_batteries["g3t1_5"] = msg->abpd_batt;
     components_batteries["g3t1_6"] = msg->glc_batt;
+    components_voltages["g3t1_1"] = msg->trm_volt;
+    components_voltages["g3t1_2"] = msg->ecg_volt;
+    components_voltages["g3t1_3"] = msg->oxi_volt;
+    components_voltages["g3t1_4"] = msg->abps_volt;
+    components_voltages["g3t1_5"] = msg->abpd_volt;
+    components_voltages["g3t1_6"] = msg->glc_volt;
 }
 
 void DataAccess::body() {
@@ -147,6 +164,8 @@ void DataAccess::receivePersistMessage(const archlib::Persist::ConstPtr& msg) {
         arrived_status++;
         persistStatus(msg->timestamp, msg->source, msg->target, msg->content);
         status[msg->source].push_back({nowInSeconds(), msg->content});
+    } else if (msg->type == "VoltageStatus"){
+        persistVoltageStatus(msg->timestamp, msg->source, msg->target, msg->content);
     } else if (msg->type == "EnergyStatus") {
         if(msg->source != "/engine") {
             std::string component_name = msg->source;
@@ -283,6 +302,13 @@ void DataAccess::persistEnergyStatus(const int64_t &timestamp, const std::string
     if (logical_clock % 30 == 0) flush();
 }
 
+void DataAccess::persistVoltageStatus(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content){
+    VoltageStatusMessage obj("VoltageStatus", timestamp, logical_clock, source, target, content);
+    voltagestatusVec.push_back(obj);
+
+    if (logical_clock % 30 == 0) flush();
+}
+
 void DataAccess::persistUncertainty(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content){
     UncertaintyMessage obj("Uncertainty", timestamp, logical_clock, source, target, content);
     uncertainVec.push_back(obj);
@@ -321,6 +347,18 @@ void DataAccess::flush(){
     }
     fp.close();
     energystatusVec.clear();
+
+    fp.open(voltage_status_filepath, std::fstream::in | std::fstream::out | std::fstream::app);   
+    for(std::vector<VoltageStatusMessage>::iterator it = voltagestatusVec.begin(); it != voltagestatusVec.end(); ++it) {
+        fp << (*it).getName() << ",";
+        fp << (*it).getLogicalClock() << ",";
+        fp << (*it).getTimestamp() << ",";
+        fp << (*it).getSource() << ",";
+        fp << (*it).getTarget() << ",";
+        fp << (*it).getVoltage() << "\n";
+    }
+    fp.close();
+    voltagestatusVec.clear();
 
     fp.open(event_filepath, std::fstream::in | std::fstream::out | std::fstream::app);   
     for(std::vector<EventMessage>::iterator it = eventVec.begin(); it != eventVec.end(); ++it) {
