@@ -43,6 +43,7 @@ namespace arch {
                 ros::Publisher log_event;
                 ros::Publisher log_status;
                 ros::Publisher log_energy_status;
+                ros::Publisher log_voltage_status;
         };
 
     }
