@@ -77,7 +77,6 @@ void Sensor::body() {
 		sendStatus("success");
         sendEnergyStatus(cost);
         sendVoltageStatus(voltage);
-        // TODO: IMPLEMENT SEND VOLTAGE STATUS....
         cost = 0.0;
     } else {
         if (battery.getCurrentLevel() < 2){
@@ -85,8 +84,10 @@ void Sensor::body() {
             throw std::domain_error("out of charge");
         }
         if (!isVoltageOk()){
+            sendStatus("fixingvoltage");
+            sendVoltageStatus(voltage);
             fixVoltage(); // In our case, Sensor is capable of reconfiguring itself
-            throw std::domain_error("fixing voltage");
+            ROS_INFO("FIXING VOLTAGE");
         }
     }
 }
@@ -119,9 +120,6 @@ void Sensor::reconfigure(const archlib::AdaptationCommand::ConstPtr& msg) {
             if(new_replicate_collect>1 && new_replicate_collect<200) replicate_collect = new_replicate_collect;
         } else if (param[0]=="volt"){
             double new_volt =  stod(param[1]);
-            if (new_volt > max_voltage || new_volt < min_voltage){
-                new_volt = 0; // to avoid component damage
-            }
             voltage = new_volt;
         }
     }
@@ -188,5 +186,5 @@ bool Sensor::isVoltageOk(){
 }
 
 void Sensor::fixVoltage(){
-    voltage = min_voltage;
+    voltage = (min_voltage + max_voltage) / 2;
 }

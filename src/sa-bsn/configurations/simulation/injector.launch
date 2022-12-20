@@ -15,8 +15,8 @@
 
     <param name="g3t1_1/volt_max" value="2.0" />
     <param name="g3t1_1/volt_min" value="0.0" />
-    <param name="g3t1_1/volt_frequency" value="0.5" />             
-    <param name="g3t1_1/volt_duration" value="3" type="int" />         
+    <param name="g3t1_1/volt_frequency" value="0.05" />             
+    <param name="g3t1_1/volt_duration" value="1" type="int" />         
     <param name="g3t1_1/volt_begin" value="0" type="int" />           
 
     <!--Parameters for g3t1_2 uncertainty injection-->
@@ -29,8 +29,8 @@
 
     <param name="g3t1_2/volt_max" value="2.0" />
     <param name="g3t1_2/volt_min" value="0.0" />
-    <param name="g3t1_2/volt_frequency" value="0.5" />             
-    <param name="g3t1_2/volt_duration" value="3" type="int" />         
+    <param name="g3t1_2/volt_frequency" value="0.05" />             
+    <param name="g3t1_2/volt_duration" value="1" type="int" />         
     <param name="g3t1_2/volt_begin" value="0" type="int" />           
 
     <!--Parameters for g3t1_3 uncertainty injection-->
@@ -43,8 +43,8 @@
 
     <param name="g3t1_3/volt_max" value="2.0" />
     <param name="g3t1_3/volt_min" value="0.0" />
-    <param name="g3t1_3/volt_frequency" value="0.5" />             
-    <param name="g3t1_3/volt_duration" value="3" type="int" />         
+    <param name="g3t1_3/volt_frequency" value="0.05" />             
+    <param name="g3t1_3/volt_duration" value="1" type="int" />         
     <param name="g3t1_3/volt_begin" value="0" type="int" />           
 
     <!--Parameters for g3t1_4 uncertainty injection-->
@@ -57,8 +57,8 @@
 
     <param name="g3t1_4/volt_max" value="2.0" />
     <param name="g3t1_4/volt_min" value="0.0" />
-    <param name="g3t1_4/volt_frequency" value="0.5" />             
-    <param name="g3t1_4/volt_duration" value="3" type="int" />         
+    <param name="g3t1_4/volt_frequency" value="0.05" />             
+    <param name="g3t1_4/volt_duration" value="1" type="int" />         
     <param name="g3t1_4/volt_begin" value="0" type="int" />           
 
     <!--Parameters for g3t1_5 uncertainty injection-->
@@ -71,8 +71,8 @@
 
     <param name="g3t1_5/volt_max" value="2.0" />
     <param name="g3t1_5/volt_min" value="0.0" />
-    <param name="g3t1_5/volt_frequency" value="0.5" />             
-    <param name="g3t1_5/volt_duration" value="3" type="int" />         
+    <param name="g3t1_5/volt_frequency" value="0.05" />             
+    <param name="g3t1_5/volt_duration" value="1" type="int" />         
     <param name="g3t1_5/volt_begin" value="0" type="int" />           
 
     <!--Parameters for g3t1_6 uncertainty injection-->
@@ -85,8 +85,8 @@
 
     <param name="g3t1_6/volt_max" value="2.0" />
     <param name="g3t1_6/volt_min" value="0.0" />
-    <param name="g3t1_6/volt_frequency" value="0.5" />             
-    <param name="g3t1_6/volt_duration" value="3" type="int" />         
+    <param name="g3t1_6/volt_frequency" value="0.05" />             
+    <param name="g3t1_6/volt_duration" value="1" type="int" />         
     <param name="g3t1_6/volt_begin" value="0" type="int" />           
 
     <!--Parameters for g4t1 uncertainty injection-->
@@ -99,8 +99,8 @@
 
     <param name="g4t1/volt_max" value="2.0" />
     <param name="g4t1/volt_min" value="0.0" />
-    <param name="g4t1/volt_frequency" value="0.5" />             
-    <param name="g4t1/volt_duration" value="3" type="int" />         
+    <param name="g4t1/volt_frequency" value="0.05" />             
+    <param name="g4t1/volt_duration" value="1" type="int" />         
     <param name="g4t1/volt_begin" value="0" type="int" />           
 
 </launch>

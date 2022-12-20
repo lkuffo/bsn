@@ -71,8 +71,8 @@ double Injector::gen_volt_noise(const std::string &component, double &volt_min_a
 
     bool is_last_cycle = (cycles == volt_end[component])?true:false;
 
-    if (is_last_cycle){
-        return 1; // no change in same cycle
+    if (!is_last_cycle){
+        return 1; // no noise during period before change
     }
 
     return ((double)rand()) / ((double)RAND_MAX) * (volt_max_amp - volt_min_amp) + volt_min_amp;
