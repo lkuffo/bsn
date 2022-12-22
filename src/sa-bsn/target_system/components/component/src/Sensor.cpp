@@ -1,6 +1,6 @@
 #include "component/Sensor.hpp"
 
-Sensor::Sensor(int &argc, char **argv, const std::string &name, const std::string &type, const bool &active, const double &noise_factor, const bsn::resource::Battery &battery, const bool &instant_recharge, const double &voltage, const double &min_voltage, const double &max_voltage) : Component(argc, argv, name), type(type), active(active), buffer_size(1), replicate_collect(1), noise_factor(0), battery(battery), data(0.0), instant_recharge(instant_recharge), cost(0.0), voltage(voltage), min_voltage(min_voltage), max_voltage(max_voltage) {}
+Sensor::Sensor(int &argc, char **argv, const std::string &name, const std::string &type, const bool &active, const double &noise_factor, const bsn::resource::Battery &battery, const bool &instant_recharge, const double &voltage, const double &min_voltage, const double &max_voltage, const std::string &state) : Component(argc, argv, name), type(type), active(active), buffer_size(1), replicate_collect(1), noise_factor(0), battery(battery), data(0.0), instant_recharge(instant_recharge), cost(0.0), voltage(voltage), min_voltage(min_voltage), max_voltage(max_voltage), state(state) {}
 
 Sensor::~Sensor() {}
 
@@ -14,6 +14,7 @@ Sensor& Sensor::operator=(const Sensor &obj) {
     this->voltage = obj.voltage;
     this->min_voltage = obj.min_voltage;
     this->max_voltage = obj.max_voltage;
+    this->state = obj.state;
 }
 
 int32_t Sensor::run() {
@@ -30,6 +31,8 @@ int32_t Sensor::run() {
 
     sendStatus("init");
     ros::spinOnce();
+
+    state = "running";
     
     while (ros::ok()) {
         ros::Rate loop_rate(rosComponentDescriptor.getFreq());
@@ -50,10 +53,27 @@ int32_t Sensor::run() {
 
 void Sensor::body() {
     
-    if (!isActive() && battery.getCurrentLevel() > 90 && isVoltageOk()){
+    if (state == "charging" && battery.getCurrentLevel() > 90){
         turnOn();
-    } else if (isActive() && (battery.getCurrentLevel() < 2 || !isVoltageOk())){
-        turnOff();        
+    } else if (state == "charging" && battery.getCurrentLevel() < 90){
+        recharge();
+        sendStatus("charging");
+        ROS_INFO("charging");
+        throw std::domain_error("out of charge");
+    } else if (state == "running" && battery.getCurrentLevel() < 2){
+        turnOff();
+        state = "charging";
+    } else if (state == "running" || state == "fixingvoltage") {
+        if (isVoltageOk()){
+            turnOn();
+        } else {
+            turnOff();
+            state = "fixingvoltage";
+            sendStatus("fixingvoltage");
+            sendVoltageStatus(voltage);
+            fixVoltage(); // In our case, Sensor is capable of reconfiguring itself
+            ROS_INFO("FIXING VOLTAGE");
+        }
     }
 
     if(isActive()) {
@@ -78,17 +98,6 @@ void Sensor::body() {
         sendEnergyStatus(cost);
         sendVoltageStatus(voltage);
         cost = 0.0;
-    } else {
-        if (battery.getCurrentLevel() < 2){
-            recharge();
-            throw std::domain_error("out of charge");
-        }
-        if (!isVoltageOk()){
-            sendStatus("fixingvoltage");
-            sendVoltageStatus(voltage);
-            fixVoltage(); // In our case, Sensor is capable of reconfiguring itself
-            ROS_INFO("FIXING VOLTAGE");
-        }
     }
 }
 
@@ -114,6 +123,7 @@ void Sensor::reconfigure(const archlib::AdaptationCommand::ConstPtr& msg) {
 
         if(param[0]=="freq"){
             double new_freq =  stod(param[1]);
+            // ROS_INFO("NEW FREQUENCY [%s]",  std::to_string(new_freq).c_str());
             rosComponentDescriptor.setFreq(new_freq);
         } else if (param[0]=="replicate_collect") {
             int new_replicate_collect = stoi(param[1]);
@@ -149,6 +159,7 @@ bool Sensor::isActive() {
 
 void Sensor::turnOn() {
     active = true;
+    state = "running";
 }
 
 void Sensor::turnOff() {

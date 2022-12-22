@@ -172,6 +172,7 @@ void DataAccess::receivePersistMessage(const archlib::Persist::ConstPtr& msg) {
             component_name = component_name.substr(1,component_name.size()-1);
             components_costs_engine[component_name] += std::stod(msg->content);
             components_costs_enactor[component_name] += std::stod(msg->content);
+            // persistEnergyStatus(msg->timestamp, msg->source, msg->target, msg->content);
         } else {
             std::string content = msg->content;
             std::replace(content.begin(), content.end(), ';', ' ');

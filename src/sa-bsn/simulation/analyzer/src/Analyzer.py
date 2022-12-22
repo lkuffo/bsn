@@ -88,7 +88,9 @@ class Analyzer:
 
         lower_bound = self.mean*(1-self.stability_margin)
         upper_bound = self.mean*(1+self.stability_margin)
-
+        print('lower bound', lower_bound)
+        print('upper bound', upper_bound)
+    
         # calculate stability point
         pos = 0
         flag = False
@@ -102,7 +104,7 @@ class Analyzer:
                 flag = False
             pos+=1
         
-
+        print('Stability point:', stability_point)
         self.stability = bool(stability_point is not 0)
         print('Stability: %r' % self.stability)
 
@@ -112,7 +114,10 @@ class Analyzer:
 
         #calculate overshoot
         #y_max = max(yi for yi in y[:stability_point])
-        self.overshoot = 100*(max(y) - self.mean)/self.mean
+        try:
+            self.overshoot = 100*(max(y) - self.mean)/self.mean
+        except:
+            self.overshoot = 100
         print('Overshoot: %.2f%%' % self.overshoot)
 
         #calculate steady-state error
@@ -169,6 +174,12 @@ class Analyzer:
             log_energy_status = list(log_csv)
             del log_energy_status[0] # delete first line
 
+        ################ load voltage status log ################
+        with open("../../knowledge_repository/resource/logs/voltagestatus_" + self.file_id + ".log", newline='') as log_file:
+            log_csv = csv.reader(log_file, delimiter=',')
+            log_voltage_status = list(log_csv)
+            del log_voltage_status[0] # delete first line
+
         ################ load event log ################
         with open("../../knowledge_repository/resource/logs/event_" + self.file_id + ".log", newline='') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
@@ -213,6 +224,7 @@ class Analyzer:
             log.extend(log_status)
         else:
             log.extend(log_energy_status)
+            #log.extend(log_voltage_status)
         log.extend(log_event)
         log.extend(log_adaptation)
 
@@ -289,6 +301,26 @@ class Analyzer:
                         formula.compute('W_'+tag, energy_status.cost, self.formula_id)
                 else:
                     global_cost_timeseries[instant] = energy_status.cost
+
+            elif(reg[0]=="VoltageStatus"):
+                voltage_status = VoltageStatus(str([1]),int(reg[2]),str(reg[3]),str(reg[4]),float(reg[5]))
+
+                if voltage_status.source != "global":
+                    tag = voltage_status.source.upper().replace(".","_").replace("/","").replace("T","_T")
+
+                    if not (tag in tasks): 
+                        tsk = Task(tag)
+                        tasks[tag] = tsk
+                    
+                    if not (tag in local_cost_timeseries):
+                        local_cost_timeseries[tag] = [[instant,voltage_status.voltage]]
+                    else:
+                        local_cost_timeseries[tag].append([instant,voltage_status.voltage])
+                
+                    for tag in tasks:
+                        formula.compute('W_'+tag, voltage_status.voltage, self.formula_id)
+                else:
+                    global_cost_timeseries[instant] = voltage_status.voltage
 
             elif(reg[0]=="Event"):
                 event = Event(str(reg[1]),str(reg[2]),str(reg[3]),str(reg[4]),str(reg[5]))
@@ -653,6 +685,15 @@ class EnergyStatus:
         self.logical_instant = _logical_instant
         self.instant = _instant
         self.cost = _cost
+
+class VoltageStatus:
+
+    def __init__(self, _logical_instant, _instant, _source, _target, _voltage):
+        self.source = _source
+        self.target = _target
+        self.logical_instant = _logical_instant
+        self.instant = _instant
+        self.voltage = _voltage
 
 class Event:
 
