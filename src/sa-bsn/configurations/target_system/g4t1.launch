@@ -4,8 +4,9 @@
     <param name="frequency" value="6" /> <!-- 1 Hz  -->
 
     <!-- operating voltage -->
-    <param name="voltage" value="30" type="double" />
-    <param name="min_voltage" value="10" type="double" />
-    <param name="max_voltage" value="50" type="double" />
+    <param name="voltage" value="3" type="double" />
+    <param name="min_voltage" value="1" type="double" />
+    <param name="max_voltage" value="6" type="double" />
+
     
 </launch>

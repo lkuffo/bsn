@@ -89,7 +89,7 @@ void Enactor::body(){
 
     ros::Subscriber subs_event = n.subscribe("event", 1000, &Enactor::receiveEvent, this);
     ros::Subscriber subs_strategy = n.subscribe("strategy", 1000, &Enactor::receiveStrategy, this);
-
+    cycles = 0;
     ros::Rate loop_rate(rosComponentDescriptor.getFreq());
     while(ros::ok()){
         if(cycles <= 60*rosComponentDescriptor.getFreq()) ++cycles;

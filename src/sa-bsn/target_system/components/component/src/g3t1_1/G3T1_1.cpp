@@ -10,7 +10,7 @@ using namespace bsn::generator;
 using namespace bsn::configuration;
 
 G3T1_1::G3T1_1(int &argc, char **argv, const std::string &name) :
-    Sensor(argc, argv, name, "oximeter", true, 1, bsn::resource::Battery("oxi_batt", 100, 100, 1), false, 0, 0, 0),
+    Sensor(argc, argv, name, "oximeter", true, 1, bsn::resource::Battery("oxi_batt", 100, 100, 1), false, 0, 0, 0, "off"),
     markov(),
     dataGenerator(),
     filter(1),
@@ -104,8 +104,9 @@ double G3T1_1::collect() {
         ROS_INFO("error collecting data");
     }
 
-    battery.consume(BATT_UNIT*(10/voltage));
-    cost += BATT_UNIT*(10/voltage);
+    battery.consume(BATT_UNIT*(voltage));
+    cost += BATT_UNIT*(voltage);
+    ROS_INFO("COST COST: [%s]", std::to_string(cost).c_str());
 
     collected_risk = sensorConfig.evaluateNumber(m_data);
 
@@ -117,8 +118,8 @@ double G3T1_1::process(const double &m_data) {
     
     filter.insert(m_data);
     filtered_data = filter.getValue();
-    battery.consume(BATT_UNIT*filter.getRange()*(10/voltage));
-    cost += BATT_UNIT*filter.getRange()*(10/voltage);
+    battery.consume(BATT_UNIT*filter.getRange()*(voltage));
+    cost += BATT_UNIT*filter.getRange()*(voltage);
 
     ROS_INFO("filtered data: [%s]", std::to_string(filtered_data).c_str());
     return filtered_data;
@@ -141,8 +142,8 @@ void G3T1_1::transfer(const double &m_data) {
     msg.volt = voltage;
 
     data_pub.publish(msg);
-    battery.consume(BATT_UNIT*(10/voltage));
-    cost += BATT_UNIT*(10/voltage);
+    battery.consume(BATT_UNIT*(voltage));
+    cost += BATT_UNIT*(voltage);
 
     ROS_INFO("risk calculated and transferred: [%.2f%%]", risk);
 }

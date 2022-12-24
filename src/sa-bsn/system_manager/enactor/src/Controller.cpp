@@ -62,7 +62,7 @@ void Controller::apply_reli_strategy(const std::string &component) {
 
     double error = r_ref[component] - r_curr[component]; //error = Rref - Rcurr
 
-    if(error > stability_margin*r_ref[component] || error < stability_margin*r_ref[component]) {
+    if(error > stability_margin*r_ref[component] || error < -stability_margin*r_ref[component]) {
 
         exception_buffer[component] = (exception_buffer[component] < 0) ? 0 : exception_buffer[component] + 1;
 
@@ -154,9 +154,13 @@ void Controller::apply_cost_strategy(const std::string &component) {
     std::cout << "c_curr[" << component << "] = "<< c_curr[component] <<std::endl;
     std::cout << "kp[" << component << "] = "<< kp[component] <<std::endl;
 
+    // if (c_ref[component] == 0 || c_curr[component] == 0){
+    //     return;
+    // }
+
     double error = c_ref[component] - c_curr[component]; //error = Cref - Ccurr
 
-    if(error > stability_margin*c_ref[component] || error < stability_margin*c_ref[component]) {
+    if(error > stability_margin*c_ref[component] || error < -stability_margin*c_ref[component]) {
 
         exception_buffer[component] = (exception_buffer[component] < 0) ? 0 : exception_buffer[component] + 1;
 
@@ -187,6 +191,7 @@ void Controller::apply_cost_strategy(const std::string &component) {
                 msg.target = component;
                 msg.action = "freq=" + std::to_string(freq[component]);
                 adapt.publish(msg);
+                //c_curr[component] = 0;
                 /*std::cout << "################################################" << std::endl;
                 std::cout << "Adapting Centralhub" << std::endl;
                 std::cout << "Action: " << msg.action << std::endl;
@@ -210,7 +215,8 @@ void Controller::apply_cost_strategy(const std::string &component) {
                 //freq[component] += (error>0) ? ((-kp[component]/100) * error) : ((kp[component]/100) * error); 
                 //double new_freq = freq[component] + ((error>0) ? ((-kp[component]/100) * error) : ((kp[component]/100) * error));
                 double new_freq = freq[component] + ((kp[component]/100) * error);
-                if(new_freq >= 0.5 && new_freq <= 25) {
+                ROS_INFO("NEW FREQUENCY [%s]", std::to_string(new_freq).c_str());
+                if(new_freq >= 0.1 && new_freq <= 25) {
                     freq[component] = new_freq;
                     archlib::AdaptationCommand msg;
                     msg.source = ros::this_node::getName();

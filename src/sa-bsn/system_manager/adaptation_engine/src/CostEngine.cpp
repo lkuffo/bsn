@@ -23,6 +23,7 @@ void CostEngine::setUp() {
     handle.getParam("setpoint", setpoint);
 	handle.getParam("offset", offset);
 	handle.getParam("gain", gain);
+    cycles = 0;
 
     enact = handle.advertise<archlib::Strategy>("strategy", 10);
     energy_status = handle.advertise<archlib::EnergyStatus>("log_energy_status", 10);

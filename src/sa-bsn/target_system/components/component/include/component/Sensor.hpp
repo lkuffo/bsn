@@ -15,7 +15,7 @@
 class Sensor : public arch::target_system::Component {
 
     public:
-		Sensor(int &argc, char **argv, const std::string &name, const std::string &type, const bool &active, const double &noise_factor, const bsn::resource::Battery &battery, const bool &instant_recharge, const double &voltage, const double &min_voltage, const double &max_voltage);
+		Sensor(int &argc, char **argv, const std::string &name, const std::string &type, const bool &active, const double &noise_factor, const bsn::resource::Battery &battery, const bool &instant_recharge, const double &voltage, const double &min_voltage, const double &max_voltage, const std::string &state);
     	~Sensor();
 
 	private:
@@ -57,6 +57,7 @@ class Sensor : public arch::target_system::Component {
         double voltage;
         double min_voltage;
         double max_voltage;
+        std::string state;
 };
 
 #endif 
