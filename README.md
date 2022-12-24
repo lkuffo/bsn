@@ -12,7 +12,7 @@ You do not need a specific OS to run the simulation. If you have all the needed 
 - Install the latest version of [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - Run Docker in your machine
 - Install the latest version of [Visual Studio Code](https://code.visualstudio.com/) (VSC)
-- Clone this repository (\url{https://github.com/lkuffo/bsn}) using Git. If you are on Windows OS: Make sure Windows did not add the carriage return characters to every file of the repository. This will cause further steps to fail. You can easily identify if this is the case if all files are marked as *modified* by git.
+- Clone this repository (https://github.com/lkuffo/bsn) using Git. If you are on Windows OS: Make sure Windows did not add the carriage return characters to every file of the repository. This will cause further steps to fail. You can easily identify if this is the case if all files are marked as *modified* by git.
 - Open VSC
 - Go to VSC Extensions and install the extension called "Dev Containers".
 - Import the BSN repository folder in VSC
