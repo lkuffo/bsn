@@ -4,7 +4,7 @@ This is the repository that contains the implementation of our group project of 
 
 Check our [demonstration video of the SA-BSN extension]().
 
-To compile and run the SA-BSN extension, follow the instructions (tested on macOS Monterey 12.1 with ROS Melodic): 
+To compile and run the SA-BSN extension, follow the instructions (tested on macOS Monterey 12.1): 
 
 ## Detailed instructions to run and observe the result of SA-BSN extension
 You do not need a specific OS to run the simulation. If you have all the needed software installed (Docker and Visual Studio Code), it will take around 10 minutes to set up and run. Follow these instructions:
