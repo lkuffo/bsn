@@ -1,6 +1,6 @@
 # Self-Adaptive Body Sensor Network (SA-BSN) Extension
 
-This is the repository that contains the implementation of our group project of the course Fundamental of Adaptive Software. In this project, we extended the SA-BSN by considering an uncertainty of unpredictable power losses in the sensor circuitry. This is a fork of the original SA-BSN repository from which we worked upon. Here you can find [all the changes made from the last commit of the original repository until the HEAD of our edited repository](https://github.com/lkuffo/bsn/compare1c45cd8f4c43e36fcf5665940d5ce7c66b907b31..HEAD?diff=unified)
+This is the repository that contains the implementation of our group project of the course Fundamental of Adaptive Software. In this project, we extended the SA-BSN by considering an uncertainty of unpredictable power losses in the sensor circuitry. This is a fork of the original SA-BSN repository from which we worked upon. Here you can find [all the changes made from the last commit of the original repository until the HEAD of our edited repository](https://github.com/lkuffo/bsn/compare/1c45cd8f4c43e36fcf5665940d5ce7c66b907b31..HEAD?diff=unified).
 
 Check our [demonstration video of the SA-BSN extension](). (TODO)
 
