@@ -1,4 +1,5 @@
 #include "enactor/Enactor.hpp"
+#include <iostream>
 #define W(x) std::cerr << #x << " = " << x << std::endl;
 
 Enactor::Enactor(int &argc, char **argv, std::string name) : ROSComponent(argc, argv, name), cycles(0), stability_margin(0.02) {}
@@ -46,7 +47,8 @@ void Enactor::receiveStatus() {
     }
     
     std::string ans = r_srv.response.content;
-    // std::cout << "received=> [" << ans << "]" << std::endl;
+    // ROS_INFO("ans: ", ans);
+    //std::cout << "received=> [" << ans << "]" << std::endl;
     if (ans == "") {
         ROS_ERROR("Received empty answer when asked for status.");
     }
@@ -55,16 +57,21 @@ void Enactor::receiveStatus() {
 
     for (auto s : pairs) {
         std::vector<std::string> pair = bsn::utils::split(s, ':');
-        std::string component = pair[0];
+        std::string component = pair[0];    
         std::string content = pair[1];
+        std::vector<std::string> split_values = bsn::utils::split(pair[1], '`');
+        std::string cost_content = split_values[0];
+        std::string voltage_content = split_values[1];
 
-        std::vector<std::string> values = bsn::utils::split(content, ',');
+        std::vector<std::string> values = bsn::utils::split(cost_content, ',');
+        std::vector<std::string> voltage_values = bsn::utils::split(voltage_content, ',');
 
         if(adaptation_parameter == "reliability") {
             r_curr[component] = stod(values[values.size() - 1]);
             apply_reli_strategy(component);
         } else {
             c_curr[component] = stod(values[values.size() - 1]);
+            c_curr[component + "_volt"] = stod(voltage_values[voltage_values.size() - 1]);
             apply_cost_strategy(component);
         }
     }
@@ -86,7 +93,6 @@ void Enactor::receiveStrategy(const archlib::Strategy::ConstPtr& msg) {
 
 void Enactor::body(){
     ros::NodeHandle n;
-
     ros::Subscriber subs_event = n.subscribe("event", 1000, &Enactor::receiveEvent, this);
     ros::Subscriber subs_strategy = n.subscribe("strategy", 1000, &Enactor::receiveStrategy, this);
     cycles = 0;

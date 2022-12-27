@@ -165,6 +165,9 @@ void DataAccess::receivePersistMessage(const archlib::Persist::ConstPtr& msg) {
         persistStatus(msg->timestamp, msg->source, msg->target, msg->content);
         status[msg->source].push_back({nowInSeconds(), msg->content});
     } else if (msg->type == "VoltageStatus"){
+        std::string component_name = msg->source;
+        component_name = component_name.substr(1,component_name.size()-1);
+        components_voltages[component_name] = std::stod(msg->content);
         persistVoltageStatus(msg->timestamp, msg->source, msg->target, msg->content);
     } else if (msg->type == "EnergyStatus") {
         if(msg->source != "/engine") {
@@ -172,7 +175,7 @@ void DataAccess::receivePersistMessage(const archlib::Persist::ConstPtr& msg) {
             component_name = component_name.substr(1,component_name.size()-1);
             components_costs_engine[component_name] += std::stod(msg->content);
             components_costs_enactor[component_name] += std::stod(msg->content);
-            // persistEnergyStatus(msg->timestamp, msg->source, msg->target, msg->content);
+            persistEnergyStatus(msg->timestamp, msg->source, msg->target, msg->content);
         } else {
             std::string content = msg->content;
             std::replace(content.begin(), content.end(), ';', ' ');
@@ -447,10 +450,10 @@ std::string DataAccess::calculateComponentCost(const std::string& component, std
     key = key.substr(1, key.size());
 
     if(req_name == "/engine") {
-        aux += std::to_string(components_costs_engine[key]) + ';';
+        aux += std::to_string(components_costs_engine[key]) + '`' + std::to_string(components_voltages[key]) +';';
         components_costs_engine[key] = 0;
     } else if(req_name == "/enactor") {
-        aux += std::to_string(components_costs_enactor[key]) + ';';
+        aux += std::to_string(components_costs_engine[key]) + '`' + std::to_string(components_voltages[key]) +';';
         components_costs_enactor[key] = 0;
     }
 
